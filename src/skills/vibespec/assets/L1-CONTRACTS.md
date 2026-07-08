@@ -90,18 +90,6 @@ invariants:
 
 ---
 
-## CONTRACTS.QUALITY_DETECTION
-
-- **QUALITY_GATE_TARGET**: Agent MUST resolve `vibespec triage gate` against `VISION.QUALITY_DETECTION`, using the project-defined item when present and otherwise falling back to the vibespec template default.
-  > Responsibility: Scope clarity — keep unified gate quality triage available without forcing every project to duplicate the template vision item.
-  > Verification: Unified gate state records the selected quality detection item ID plus its source.
-
-- **QUALITY_GATE_SCOPE**: Triage Agent MUST audit `src/` for workaround logic, legacy logic, concurrency bottlenecks, deadlocks, dead waits, and blind waits.
-  > Responsibility: Quality detection — make the unified gate concrete and repeatable.
-  > Verification: Triage checklist contains all six quality defect classes.
-
----
-
 ## CONTRACTS.SYSTEM_FIRST
 
 - **TARGET**: System MUST handle file I/O, validation, archival, formatting.

@@ -1,54 +1,74 @@
 # vibespec
 
-> Spec-Driven Vibe Coding Framework
+> Spec-driven workflow for turning raw ideas into traceable L0-L3 specifications.
 
-A hierarchical specification system for LLM-driven development. Define specs in layers (L0-L3), validate traceability, and compile to a single authoritative document for AI coding assistants.
+vibespec is a Codex skill and reference spec set for managing specification-first development. It helps capture ideas, refine them into layered specs, validate traceability, review quality, and bootstrap minimal implementation/test skeletons when a repo only has specs.
 
-**This project is self-hosting**: It uses vibespec to define its own goals, architecture, and contracts. See the [specs/](specs/) directory for a live demonstration.
+This project is self-hosting: the [specs/](specs/) directory defines vibespec's own scope, contracts, architecture, and runtime behavior.
 
-## Quick Start (Dogfooding)
+## Quick Start
 
-Validate the framework using its own bootstrap specifications:
+Run these from the repository root:
 
 ```bash
-# Validate the bootstrap specs
-cd src/skills/vibespec
-python3 scripts/validate.py ../../../specs/
-
-# Ingest new ideas or pending changes
-vibespec ingest
+python3 src/skills/vibespec/scripts/validate.py specs/
+python3 -m unittest discover tests/specs
 ```
+
+The validator reports structural errors as failures. It may also print traceability and coverage guidance for leaf L1 contracts that still need stronger verification.
+
+## Skill Workflows
+
+When the skill is available in Codex, use these workflows:
+
+- `vibespec` - list the available workflows.
+- `vibespec ingest` - bootstrap missing specs, ingest pending ideas, or validate existing specs.
+- `vibespec idea <content>` - save a raw idea for later refinement.
+- `vibespec review [SPEC_ID]` - audit one spec item or a layer root.
+- `vibespec reflect` - turn recent conversation context into candidate ideas after approval.
+- `vibespec distill` - compare code against specs and propose missing spec updates.
+- `vibespec bug [description]` - run spec-aware root cause analysis.
+- `vibespec bootstrap impl` - generate minimal `src/`, contract-test skeletons, supplemental tests, and `scripts/test-workflow.sh` for a specs-only repo.
+- `vibespec test` - certify implementation behavior against L1 contracts.
 
 ## The Spec Hierarchy
 
-vibespec enforces a 4-layer hierarchy with **implicit metadata** (Layer/ID derived from filename, Exports from headings):
+vibespec uses a four-layer hierarchy with strict top-down traceability:
 
-- **L1: Contracts** ([L1-CONTRACTS.md](specs/L1-CONTRACTS.md)) - Semantic rules (e.g., Unique IDs, Layer order).
-- **L2: Architecture** ([L2-ARCHITECTURE.md](specs/L2-ARCHITECTURE.md)) - Component topology (e.g., Compiler Pipeline).
-- **L3: Runtime** ([L3-RUNTIME/](specs/L3-RUNTIME/)) - Implementation details.
+- **L0: Vision** ([L0-VISION.md](specs/L0-VISION.md)) - product scope, goals, and boundaries.
+- **L1: Contracts** ([L1-CONTRACTS.md](specs/L1-CONTRACTS.md)) - externally visible behavior and semantic rules.
+- **L2: Architecture** ([L2-ARCHITECTURE.md](specs/L2-ARCHITECTURE.md)) - components, data flow, and responsibility boundaries.
+- **L3: Runtime** ([L3-RUNTIME/](specs/L3-RUNTIME/)) - implementation workflows and operational details.
 
 ## Testing & Verification
 
-vibespec provides a testing framework to verify that your code adheres to its specs.
-
-### 1. Annotate your tests
+L1 contracts are the verification surface. Generated contract tests use comment-form anchors:
 
 ```python
-from vibe_spec.testing import verify_spec
-
-@verify_spec("CONTRACTS.METADATA_INTEGRITY")
-def test_metadata_parsing():
-    # Your test logic here
-    pass
+# @verify_spec("CONTRACTS.VALIDATION.FULL_SCAN", mode="system")
+def test_full_scan_reports_structural_errors():
+    ...
 ```
 
-### 2. Run with coverage collection
+This repository's spec tests also provide a small local decorator for unit tests:
 
-When you run your tests via `pytest`, vibespec tracks which specs were verified by passing tests.
+```python
+from tests.specs.conftest import verify_spec
 
-```bash
-uv run pytest
+@verify_spec("CONTRACTS.VALIDATION")
+def test_validation_contract():
+    ...
 ```
+
+Group-level anchors are allowed for organizing tests, but coverage is calculated over leaf L1 contracts.
+
+## Project Layout
+
+- [specs/](specs/) - this project's self-hosted L0-L3 specifications.
+- [src/skills/vibespec/SKILL.md](src/skills/vibespec/SKILL.md) - Codex skill entrypoint and workflow routing.
+- [src/skills/vibespec/references/](src/skills/vibespec/references/) - detailed workflow and review protocols.
+- [src/skills/vibespec/scripts/](src/skills/vibespec/scripts/) - deterministic validation and bootstrap helpers.
+- [tests/specs/](tests/specs/) - black-box contract checks for the spec system.
 
 ---
 

@@ -122,6 +122,11 @@ def is_testable_l1_contract(item_id: str, l1_ids: set[str]) -> bool:
     return not any(other_id.startswith(child_prefix) for other_id in l1_ids if other_id != item_id)
 
 
+def is_l1_contract_id(item_id: str, l1_ids: set[str]) -> bool:
+    """@verify_spec may anchor a suite to a grouping contract without counting as leaf coverage."""
+    return item_id.startswith('CONTRACTS.') and item_id in l1_ids
+
+
 def is_skip_like_content(content: str) -> bool:
     lowered = content.lower()
     return (
@@ -473,14 +478,14 @@ def validate_references(references_dir: Path, tests_dir: Path = None, project_pr
         })
 
         for ref_id, filenames in sorted(verify_refs.items()):
-            if ref_id not in testable_ids:
+            if not is_l1_contract_id(ref_id, l1_ids):
                 names = ", ".join(sorted(filenames))
                 errors.append(
                     f"Orphan @verify_spec: `{ref_id}` is referenced in {names} but no active L1 contract exports that ID."
                 )
 
         for ref_id, filenames in sorted(inferred_contract_refs.items()):
-            if ref_id not in testable_ids:
+            if not is_l1_contract_id(ref_id, l1_ids):
                 names = ", ".join(sorted(filenames))
                 errors.append(
                     f"Orphan C# contract test: `{ref_id}` is inferred from {names} but no active L1 contract exports that ID."

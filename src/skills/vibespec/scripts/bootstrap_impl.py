@@ -180,16 +180,6 @@ def asset_text(name: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def render_gate_profile(contract_spec: str, black_box_glob: str, white_box_glob: str, run_commands: list[str]) -> str:
-    template = asset_text("gate-profile.json.tmpl")
-    return (
-        template.replace("__BLACK_BOX_GLOB__", black_box_glob)
-        .replace("__WHITE_BOX_GLOB__", white_box_glob)
-        .replace("__CONTRACT_SPEC__", contract_spec)
-        .replace("__RUN_COMMANDS_JSON__", json.dumps(run_commands, indent=2))
-    )
-
-
 def render_test_workflow(contracts_command: str, whitebox_command: str) -> str:
     template = asset_text("test-workflow.sh.tmpl")
     return (
@@ -379,7 +369,7 @@ def assert_bootstrap_preconditions(repo_root: Path, specs_dir: Path) -> None:
 
     src_dir = repo_root / "src"
     if src_dir.exists() and any(path.is_file() for path in src_dir.rglob("*")):
-        raise SystemExit("`src/` already contains files. Use `vibespec triage gate` / `vibespec fix gate` instead.")
+        raise SystemExit("`src/` already contains files. Use `vibespec test`, `vibespec review`, `vibespec bug`, or `vibespec distill` instead.")
 
     tests_dir = repo_root / "tests"
     if tests_dir.exists():
@@ -492,16 +482,6 @@ def generate_common_files(lang: str, model: SpecModel) -> tuple[dict[str, str], 
     contracts_command, whitebox_command = language_commands(lang)
     files["scripts/test-workflow.sh"] = render_test_workflow(contracts_command, whitebox_command)
     executable_paths.add("scripts/test-workflow.sh")
-    files["specs/gate-profile.json"] = render_gate_profile(
-        contract_spec=model.contract_spec_path,
-        black_box_glob=f"tests/e2e/contracts_*{TEST_EXT[lang]}",
-        white_box_glob=f"tests/e2e/whitebox_*{TEST_EXT[lang]}",
-        run_commands=[
-            "./scripts/test-workflow.sh contracts",
-            "./scripts/test-workflow.sh whitebox",
-            "./scripts/test-workflow.sh all",
-        ],
-    )
     return files, executable_paths
 
 

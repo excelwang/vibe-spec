@@ -36,9 +36,8 @@
    - black-box contract test skeletons
    - white-box supplemental test skeletons
    - `scripts/test-workflow.sh`
-   - `specs/gate-profile.json`
 7. Do not run project-native tests in this workflow.
-8. After bootstrap, direct the user to `vibespec triage gate` / `vibespec fix gate`.
+8. After bootstrap, direct the user to `vibespec test` when they are ready to refine or certify verification.
 
 ## IdeaToSpecWorkflow
 

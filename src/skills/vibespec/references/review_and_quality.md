@@ -117,3 +117,4 @@ interface Validator {
 3. **Implicit Traceability**: L1-L0 relationship is tracked by shared ID suffixes. L2/L3 traceability is enforced via **Agent-led Logic Audit** during refinement.
 4. **Terminology**: Standardize on `Agent | System` (deterministic vs. stochastic).
 5. **RFC2119 Keywords**: L1 items MUST use MUST/SHOULD/MAY for enforceability.
+6. **Runtime Quality Causality**: Quality review MUST trace runtime policy enforcement, validation order, idempotency consumption order, and recoverable failure surfaces from actual code paths rather than from helper presence or naming.

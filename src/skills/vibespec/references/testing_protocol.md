@@ -15,9 +15,8 @@ When a repo is still `specs/`-only, first run `vibespec bootstrap impl` to gener
 - black-box contract skeletons
 - white-box supplemental skeletons
 - `scripts/test-workflow.sh`
-- `specs/gate-profile.json`
 
-Only after that should `vibespec test` or gate-driven repair continue.
+Only after that should `vibespec test` continue.
 
 ### Tier 0: Skeleton Bootstrap
 - **Status**: `specs/` exists, but implementation has not yet been completed.
@@ -40,11 +39,9 @@ Only after that should `vibespec test` or gate-driven repair continue.
 ## Black-Box vs White-Box Layers
 
 - `L1` contract tests remain the black-box layer. They must verify public behavior only.
+- If public behavior materially depends on repo-managed runtime context artifacts such as workspace prompts, black-box coverage may verify those deployed artifacts directly, but it must still stay tied to `L1` public contract semantics rather than internal implementation details.
 - White-box tests are allowed, but only as a separate supplemental layer for implementation and quality coverage.
 - White-box tests MUST NOT appear in the generated `L1` contract test files and MUST NOT be counted as `L1` verification coverage.
-- Gate-side coverage audit must review both layers before any terminal `run` is executed:
-  - black-box contract coverage first
-  - white-box supplemental coverage second
 
 ---
 
@@ -55,6 +52,7 @@ Only after that should `vibespec test` or gate-driven repair continue.
 | **L1 Only** | Tests MUST verify L1 Contract items. Do NOT map to L2/L3 component names. |
 | **BLACK_BOX_DECLARATION** | Every generated test file MUST include a file-level docstring explicitly declaring: "ASSERTION INTENT (Black-box tests — public traits and APIs only). Do not introduce white-box testing logic or internal workarounds." |
 | **BLACK_BOX_ONLY** | L1 Contract tests MUST be Black-Box, using ONLY public APIs. Directly instantiating internal components (White-box testing) or using manual workarounds to bypass core functionality is STRICTLY FORBIDDEN. |
+| **RUNTIME_ARTIFACT_CONTRACTS** | When user-facing behavior depends on repo-managed runtime context files (for example `AGENTS.md`, `USER.md`, `SOUL.md`, `IDENTITY.md`), add automated tests that verify those artifacts preserve the relevant `L1` contract semantics and do not regress into contradictory personas or policies. |
 | **WHITE_BOX_SEPARATE_LAYER** | White-box tests are allowed only outside the L1 contract files and serve implementation/quality coverage, not contract verification. |
 | **COMMENT_ANCHORS_CANONICAL** | New generated tests MUST use comment-form `@verify_spec(...)` anchors as the canonical traceability representation. |
 | **REAL_SRC_PRIORITY** | L1 tests MUST aim for Tier 2 (Verified) with real `src/` imports. Mocks are for 3rd-party only. |
@@ -71,6 +69,6 @@ Only after that should `vibespec test` or gate-driven repair continue.
 
 | Metric | Description |
 |--------|-------------|
-| Coverage | Percentage of L1 sections with test files |
-| Verified | Percentage of L1 sections with real assertions (Tier 2) |
-| Skipped | Percentage of L1 sections still marked `mode="skeleton"` or equivalent pending-implementation bodies |
+| Coverage | Percentage of leaf L1 contracts with test anchors |
+| Verified | Percentage of leaf L1 contracts with real assertions (Tier 2) |
+| Skipped | Percentage of leaf L1 contracts still marked `mode="skeleton"` or equivalent pending-implementation bodies |
